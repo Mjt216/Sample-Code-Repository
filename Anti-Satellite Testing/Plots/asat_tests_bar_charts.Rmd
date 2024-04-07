@@ -1,0 +1,52 @@
+---
+title: "Module 6 Visualizations"
+author: "Michael Tompkins"
+date: "2023-10-09"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Description
+
+The first bar plot shows the total number of anti-satellite (ASAT) tests that China, India, Russia (and former USSR), and the United States have conducted since 1959.
+
+The second bar plot shows the collective number of ASAT tests conducted around the world every year from 1959 to 2022. 
+
+
+```{r Plots, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+
+ASAT_counts_total <- read_csv("ASAT_counts_total.csv")
+ASAT_world_counts <- read_csv("ASAT_world_counts.csv")
+
+custom_colors <- c("China" = "gold", "India" = "darkgreen", "Russia" = "darkred", "USA" = "darkblue")
+
+#Totals by country
+ggplot(ASAT_counts_total, aes(x = Country, y = Total_count, fill = Country)) +
+  geom_col(alpha = .7) +
+  ggtitle("Total ASAT Tests by Country") +
+  scale_fill_manual(values = custom_colors) +
+  labs(y = "Total Tests")
+
+#Tests over time
+ggplot(ASAT_world_counts, aes(x = Year, y = Worldwide)) +
+  geom_col(fill = "darkred", alpha = .7) +
+  ggtitle("Worldwide ASAT Tests Over Time") +
+  labs(y = "Tests Per Year") +
+  theme(plot.background = element_rect(fill = "darkgray")) +
+  theme(
+  panel.background = element_rect(fill = "darkgray",
+                                colour = "darkgray",
+                                size = 0.5, linetype = "solid"),
+  panel.grid.major = element_line(size = 0.5, linetype = 'solid',
+                                colour = "white"), 
+  panel.grid.minor = element_line(size = 0.25, linetype = 'solid',
+                                colour = "white")
+  )
+```
+

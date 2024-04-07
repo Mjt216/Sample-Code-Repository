@@ -1,0 +1,68 @@
+---
+title: "Mod 7 Visualizations"
+author: "Michael Tompkins"
+date: "2023-10-17"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+## Description
+
+The first chart is a ridgeline chart that shows the distribution of the number of discrete pieces of debris created by each anti-satellite (ASAT) test. The distributions are stratified by country. India was left off of this chart because it has only conducted two tests - one that resulted in no debris, and the other that resulted in the relatively low number of 130 pieces. These figures resulted in barely a mark on the chart. While India's data is important, it takes away from the rest of the data presented.
+
+As we can see from the ridgeline chart, most ASAT tests have resulted in no debris. The outliers, however, produced thousands of pieces of trackable (>10 cm) debris, which present major hazards in Low Earth Orbit (LEO).
+
+The second chart is a violin chart that shows the distribution ASAT tests over time by country. India was left off of this chart because both of its tests were conducted in 2019, which results in no line on this chart. Due to the 60-year timeline, the decision was made to keep the dates in years and drop India from the chart.
+
+As we can see from the violin chart, the United States has had a much more erratic distribution of ASAT tests than Russia (formerly the USSR), which has been much more steady. The United States conducted more tests at a time than Russia, likely due to a combination of policy priorities and funding. China is a newcomer to ASAT testing, but has started with vigor.
+
+```{r pressure, echo=FALSE}
+library(ggthemes)
+library(ggplot2)
+library(tidyverse)
+library(ggridges)
+
+ASAT_hx <- read_csv("ASAT_Hx.csv")
+
+ASAT_hx <- ASAT_hx %>%
+  filter(Country != "India")
+
+custom_color <- c(China = "gold2", Russia = "firebrick", USA = "dodgerblue3")
+
+#Ridgeline Chart
+ASAT_hx$TotalDebris <- as.numeric(ASAT_hx$TotalDebris)
+
+ggplot(ASAT_hx, aes(x = TotalDebris, y = Country, fill = Country)) +
+  geom_density_ridges() +
+  scale_fill_manual(values = custom_color) +
+  theme_economist() + 
+  scale_colour_economist() +
+  ggtitle("Distribution of Discrete Debris Creation for the USA, Russia, and China") +
+  xlab("Total Discrete Pieces of Debris Created per Test") +
+  theme(axis.title.x = element_text(vjust = -3)) +
+  theme(axis.title.y = element_blank()) +
+  theme(plot.title = element_text(size = 12))
+
+#Violin Chart
+ggplot(ASAT_hx, aes(x = TestYear, y = Country, fill = Country, alpha = .5)) +
+  geom_violin() +
+  scale_fill_manual(values = custom_color) +
+  theme_excel() +
+  scale_colour_excel() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()
+  ) +
+  guides(alpha = "none") +
+  ggtitle("Distribution of ASAT Tests Over Time for the USA, Russia, and China") +
+  xlab("Test Year") +
+  ylab("")
+```
+

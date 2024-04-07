@@ -1,0 +1,59 @@
+---
+title: "Mod 9 Visualization"
+author: "Michael Tompkins"
+date: "2023-11-01"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+```
+
+## Description
+
+This is a map of the launch locations for all historical anti-satellite (ASAT) tests. As you can see, only Russia (formerly USSR), China, the United States, and India have conducted such tests. The size of each point corresponds to the number of tests conducted from that particular site. It is interesting to note that the United States has taken advantage of its access to island launch sites near the equator. The closer a launch is to the equator, the less fuel the rocket needs to burn due to the higher speed of the Earth's rotation at that latitude.
+
+
+```{r Map, echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(tidyverse)
+library(maps)
+library(ggplot2)
+
+my_world_map <- map_data("world")
+
+launch_data <- read_csv("ASAT_Hx.csv")
+
+launch_data$Launch_lat <- as.numeric(launch_data$Launch_lat)
+launch_data$Launch_long <- as.numeric(launch_data$Launch_long)
+
+launch_data <- launch_data %>% filter(!is.na(Launch_long))
+
+launch_data <- launch_data %>%
+  mutate(Country = case_when(
+    Launch_Site %in% c("Baikonur", "Plesetsk") ~ "Russia",
+    Launch_Site %in% c("Xichang", "Korla", "Jiuquan") ~ "China",
+    Launch_Site %in% c("San Nicholas Island", "WSMR", "Kwajalein", "Johnston Island", "AFETR") ~ "USA",
+    Launch_Site == "Abdul Kalam island" ~ "India"))
+
+site_counts <- launch_data %>% group_by(Launch_Site) %>% summarize(Count = n())
+
+ggplot(data = my_world_map, mapping = aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "white", color = "black") +
+  geom_point(data = launch_data, aes(x = Launch_long, y = Launch_lat, group = NULL, color = Country, size = Launch_Site)) +
+  scale_size_discrete(guide = "none") + 
+  scale_color_manual(values = c(Russia = "darkred", China = "gold", USA = "darkblue", India = "darkgreen")) +
+  guides(color = guide_legend(title = "Launching Country")) +
+  xlab("Longitude") +  
+  ylab("Latitude") +
+  coord_equal(ratio = 1) +
+  theme(legend.position="top") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_blank()) +
+  ggtitle("ASAT Test Launch Locations")
+```
+

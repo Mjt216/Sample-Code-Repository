@@ -1,0 +1,266 @@
+---
+title: "Global Anti-Satellite (ASAT) Testing"
+runtime: shiny
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: fill
+    theme: 
+      bootswatch: slate
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(maps)
+library(ggplot2)
+library(shiny)
+library(plotly)
+library(gganimate)
+library(transformr)
+library(gifski)
+library(knitr)
+library(ggthemes)
+library(ggridges)
+library(curl)
+```
+
+ASAT Testing
+=======================================================================
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Background
+#### Destructive Anti-Satellite (ASAT) Testing
+
+<font size = "5"> Orbital debris has become a larger and larger problem as Earth orbits become more and more crowded. Governments and commercial space actors use highly specific orbits such as Low/Medium/High Earth Orbits (LEO/MEO,HEO), Polar Orbit, and Geostationary Orbit (GEO). Each orbit has specific advantages for different types of spacecraft. Due to the specific altitudes at which satellites are placed into orbit, these areas of space have become quite crowded. Space actors now worry about events like the Kessler Effect, which is a theory that an overcrowded LEO will create a chain reaction of collisions that will generate a permanent field of debris encircling the planet.</font>
+
+<font size = "5"> The recent sharp uptick in launches of spacecraft has brought this problem of orbital debris to the fore. Despite the danger, the world's top space actors - the United States, Russia, China, and India - have conducted destructive anti-satellite (ASAT) testing. This type of testing creates unpredictable debris, sometimes by the thousands. The last test, conducted by China, caused the astronauts on the International Space Station to take shelter in their escape vehicle. ASAT tests can be divided into two categories: direct ascent and co-orbital. Direct ascent describes a projectile or vehicle launched directly at a satellite in space from a rocket on the ground. Co-orbital tests involve a spacecraft conducting maneuvers in orbit to de-orbit or otherwise destroy/damage another satellite.</font>
+
+<font size = "5"> The intent of this portfolio is to gain a better understanding of how destructive ASAT testing has affected the amount of debris in orbit - and therefore how much risk it poses to spacecraft in orbit.</font>
+
+### Data Sources
+
+<font size = "5">**The History of ASAT Tests in Space** is a dataset that contains information about every known anti-satellite (ASAT) test conducted by the United States, Russia, China, and India. It is a product of the Secure World Foundation - a well-known NGO that "envisions the secure, sustainable and peaceful uses of outer space contributing to global stability and benefits on Earth."</font>
+
+Mazeaud, L., & Weeden, B. (2023, Feb 20). History of Anti-Satellite Tests in Space. Retrieved from Secure World Foundation: https://docs.google.com/spreadsheets/d/1e5GtZEzdo6xk41i2_ei3c8jRZDjvP4Xwz3BVsUHwi48/edit#gid=0
+
+<p>&nbsp;</p>
+
+<font size = "5">**The Objects in Orbit** and the **Objects No Longer in Orbit (i.e. Decayed)** datasets are elements of The Satellite Situation Report from Space-Track.org, which is the public-facing orbital debris information website run by the Combined Force Space Component Command (CFSCC) at Vandenberg Space Force Base. The orbital data is collected from the U.S. Space Command (USSPACECOM), U.S. Space Force, or provided by Satellite Owners.</font>
+
+CFSCC. (2023, Sep 24). SSR. Retrieved from Space-Track.org: space-track.org/#ssr
+
+### Tests Over Time
+
+```{r,fig.cap="This line chart shows global ASAT tests over time. The peaks are in the 1960's and more recently, with a lull after the fall of the Soviet Union."}
+tests_per_year <- read.csv("tests_per_year.csv")
+
+if (is.character(tests_per_year$Year)) {
+  tests_per_year$Year <- as.factor(tests_per_year$Year)
+} else if (is.numeric(tests_per_year$Year)) {
+  tests_per_year$Year <- as.integer(tests_per_year$Year) 
+}
+
+ggplot_obj <- ggplot(tests_per_year, aes(x=Year, y=total_tests)) +
+  geom_line(color="darkred", size=1.5) + 
+  labs(title='Total Global ASAT Tests Per Year', x='Year', y='Total Tests') +
+  theme_dark() +
+  theme(plot.background = element_rect(fill = "grey34"),
+        plot.title = element_text(size = 20, color = "grey90"), 
+        axis.title.x = element_text(size = 15, color = "grey90"), 
+        axis.text = element_text(size = 12, color = "grey90"),
+        axis.title.y = element_text(size = 15, color = "grey90"))
+
+anim_obj <- ggplot_obj + 
+  transition_reveal(Year) +
+  ease_aes('linear')
+
+animate(anim_obj, duration = 10, fps = 10, width = 800, height = 600, renderer = gifski_renderer())
+anim_save("total_ASAT.gif", animation = anim_obj)
+```
+
+Launch Locations
+=======================================================================
+
+Row 
+-----------------------------------------------------------------------
+
+### <font size = "5">Launch Sites</font>
+
+```{r, out.height="100%",out.width="100%", fig.cap="This is a map of the launch locations for all historical anti-satellite (ASAT) tests. As you can see, only Russia (formerly USSR), China, the United States, and India have conducted such tests. The size of each point corresponds to the number of tests conducted from that particular site. It is interesting to note that the United States has taken advantage of its access to island launch sites near the equator. The closer a launch is to the equator, the less fuel the rocket needs to burn due to the higher speed of the Earth's rotation at that latitude."}
+my_world_map <- map_data("world")
+
+launch_data <- read_csv("ASAT_Hx.csv")
+
+launch_data$Launch_lat <- as.numeric(launch_data$Launch_lat)
+launch_data$Launch_long <- as.numeric(launch_data$Launch_long)
+
+launch_data <- launch_data %>% filter(!is.na(Launch_long))
+
+launch_data <- launch_data %>%
+  mutate(Country = case_when(
+    Launch_Site %in% c("Baikonur", "Plesetsk") ~ "Russia",
+    Launch_Site %in% c("Xichang", "Korla", "Jiuquan") ~ "China",
+    Launch_Site %in% c("San Nicholas Island", "WSMR", "Kwajalein", "Johnston Island", "AFETR") ~ "USA",
+    Launch_Site == "Abdul Kalam island" ~ "India"))
+
+site_counts <- launch_data %>% group_by(Launch_Site) %>% summarize(Count = n())
+
+ggplot(data = my_world_map, mapping = aes(x = long, y = lat, group = group)) +
+  geom_polygon(fill = "grey90", color = "black") +
+  geom_point(data = launch_data, aes(x = Launch_long, y = Launch_lat, group = NULL, color = Country, size = Launch_Site)) +
+  scale_size_discrete(guide = "none") + 
+  scale_color_manual(values = c(Russia = "darkred", China = "gold", USA = "darkblue", India = "darkgreen")) +
+  guides(color = guide_legend(title = "Launching Country")) +
+    coord_equal(ratio = 1) +
+  theme(legend.position="top") +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  theme(axis.title.x = element_blank()) +
+  theme(axis.title.y = element_blank()) +
+    theme(plot.background = element_rect(fill = "grey34"),
+        panel.background = element_rect(fill = "grey34"),
+        plot.title = element_text(color = "grey66"),
+        legend.text = element_text(color = "grey66"),  
+        legend.title = element_text(color = "grey66"),
+        legend.key = element_rect(fill = "grey34"),
+        legend.background = element_rect(fill = "grey34")) +
+  ggtitle("ASAT Test Launch Locations")
+```
+
+Testing Over Time
+=======================================================================
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### <font size = "5">Distribution of ASAT Tests Over Time for the USA, Russia, and China</font>
+
+```{r, fig.cap="This violin chart shows the distribution ASAT tests over time by country. Inia was left off of this chart because both of its tests were conducted in 2019, which results in no line. As we can see from the chart, the United States has had a much more erratic distribution of ASAT tests than Russia, which has been much more steady. The United States conducted more tests at a time than the USSR, likely due to a combinations of policy priorities and funding. China is a newcomer to ASAT testing, but has started with vigor."}
+ASAT_hx <- read_csv("ASAT_Hx.csv")
+
+ASAT_hx <- ASAT_hx %>%
+  filter(Country != "India")
+
+custom_color <- c("China" = "gold3", "Russia" = "firebrick", "USA" = "dodgerblue3", "India" = "darkgreen")
+
+ggplot(ASAT_hx, aes(x = TestYear, y = Country, fill = Country, alpha = .5)) +
+  geom_violin() +
+  scale_fill_manual(values = custom_color) +
+  theme_excel() +
+  scale_colour_excel() +
+  theme(
+    panel.grid.major.y = element_blank(),
+    panel.grid.minor.y = element_blank()
+  ) +
+  guides(alpha = "none") +
+  #ggtitle("Distribution of ASAT Tests Over Time for the USA, Russia, and China") +
+  xlab("Test Year") +
+  ylab("") +
+  theme(plot.background = element_rect(fill = "grey34"),
+        plot.title = element_text(color = "grey90"),
+        legend.text = element_text(color = "grey90"),  
+        legend.title = element_text(color = "grey90"),
+        axis.text = element_text(color = "grey90"),
+        axis.title = element_text(color = "grey90"),
+        legend.background = element_rect(fill = "grey34"))
+
+#![](Violin_chart.png)
+```
+
+### <font size = "5">ASAT Tests by Country and Interceptor Type</font>
+
+```{r,}
+launch_data <- read_csv("ASAT_Hx.csv")
+
+ggplot(launch_data, aes(x = Country, fill = InterceptorType)) +
+  geom_bar(alpha = 0.8, position = position_dodge()) +
+  theme_minimal() +
+  labs(x = 'Country',
+       y = 'Observation Count') +
+  scale_fill_manual(values = c("co-orbital" = "dodgerblue3", 
+                               "direct ascent" = "firebrick")) +
+  theme(plot.background = element_rect(fill = "grey34"),
+        plot.title = element_text(color = "grey90", hjust = -5),
+        panel.background = element_rect(fill = "grey34"),
+        legend.text = element_text(color = "grey90"),  
+        legend.title = element_text(color = "grey90"),
+        axis.text = element_text(color = "grey90"),
+        axis.title = element_text(color = "grey90"),
+        legend.background = element_rect(fill = "grey34"))
+```
+
+Debris Creation
+=======================================================================
+
+Row {.tabset .tabset-fade}
+-----------------------------------------------------------------------
+
+### Debris Created by Test
+
+```{r,fig.cap="This scatterplot shows the amount of debris created by each individual test. As you can see most tests created no debris. The two outliers (tests by China and Russia) account for the vast majority of debris from ASAT testing."}
+asat_summary <- read.csv("asat_summary.csv")
+asat_summary$test_date <- as.Date(asat_summary$test_date, format="%m/%d/%Y")
+
+custom_color <- c("China" = "gold3", "Russia" = "firebrick", "USA" = "dodgerblue3", "India" = "darkgreen")
+
+p <- ggplot(asat_summary, aes(x = test_date, y = total_debris, color = Country, 
+                              text = paste("Date:", test_date, "<br>Interceptor Type:", interceptor_type, "<br>Total Debris:", total_debris))) +
+  geom_point(size = "3") +
+  scale_color_manual(values = custom_color) +
+  ggtitle("Debris Created by ASAT Testing") +
+  xlab("Test Date") +
+  ylab("Debris Created") +
+  scale_x_date(limits = as.Date(c('1959-01-01', '2023-12-31'))) +
+  guides(size = FALSE) +
+  theme_minimal() +
+  theme(plot.background = element_rect(fill = "grey34"),
+        plot.title = element_text(color = "grey90", hjust = -5),
+        panel.background = element_rect(fill = "grey34"),
+        legend.text = element_text(color = "grey90"),  
+        legend.title = element_text(color = "grey90"),
+        axis.text = element_text(color = "grey90"),
+        axis.title = element_text(color = "grey90"),
+        legend.background = element_rect(fill = "grey34"))
+
+fig <- ggplotly(p, tooltip = "text") 
+
+fig
+```
+
+### Debris Creation
+
+```{r, out.height="65%",out.width="100%",fig.cap="This ridgeline chart shows the distribution of the number of discrete pieces of debris created by each anti-satellite (ASAT) test. The distributions are stratified by country. India was left off because it has only conducted one test that produced debris. While India is important, it takes away from the rest of the data presented. As we can see from the chart, most ASAT tests produced no debris. The outliers, however, produced thousands of pieces of trackable (>10cm) debris, which present majore hazards in orbit."}
+ASAT_hx <- read_csv("ASAT_Hx.csv")
+
+ASAT_hx <- ASAT_hx %>%
+  filter(Country != "India")
+
+custom_color <- c(China = "gold3", Russia = "firebrick", USA = "dodgerblue3")
+
+ASAT_hx$TotalDebris <- as.numeric(ASAT_hx$TotalDebris)
+
+ggplot(ASAT_hx, aes(x = TotalDebris, y = Country, fill = Country)) +
+  geom_density_ridges() +
+  scale_fill_manual(values = custom_color) +
+  theme_economist() + 
+  scale_colour_economist() +
+  ggtitle("Distribution of Discrete Debris Creation for the USA, Russia, and China") +
+  xlab("Total Discrete Pieces of Debris Created per Test") +
+  theme(axis.title.x = element_text(vjust = -3)) +
+  theme(axis.title.y = element_blank()) +
+  theme(plot.title = element_blank(),
+        legend.title = element_blank()
+        ) +
+  theme(plot.background = element_rect(fill = "grey34"),
+        plot.title = element_text(color = "grey90", hjust = -5),
+        panel.background = element_rect(fill = "grey34"),
+        legend.position = "none",
+        axis.text = element_text(color = "grey90"),
+        axis.title = element_text(color = "grey90"),
+        legend.background = element_rect(fill = "grey90"))
+
+#![](Ridge Chart.png)
+```
+

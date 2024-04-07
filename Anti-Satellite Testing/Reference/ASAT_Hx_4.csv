@@ -1,0 +1,82 @@
+Country,TestDate,TestYear,Target_Object,InterceptorType,TotalDebris,Decayed,in_orbit,Date of Final Piece Re-entry,"Lifespan of Debris 
+(years on orbit or to date)"
+Russia,11/1/1963,1963,None,co-orbital,0,0,0,–,0
+Russia,4/12/1964,1964,None,co-orbital,0,0,0,–,0
+Russia,10/27/1967,1967,None,co-orbital,0,0,0,–,0
+Russia,10/20/1968,1968,Cosmos 248,co-orbital,252,173,79,Still On Orbit,54.99
+Russia,10/23/1970,1970,Cosmos 373,co-orbital,147,112,35,Still On Orbit,52.98
+Russia,2/25/1971,1971,Cosmos 394,co-orbital,118,73,45,Still On Orbit,52.64
+Russia,3/18/1971,1971,Cosmos 400,co-orbital,0,0,0,–,0
+Russia,12/3/1971,1971,Cosmos 459,co-orbital,29,29,0,4/4/1975,3.34
+Russia,2/16/1976,1976,Cosmos 803,co-orbital,0,0,0,–,0
+Russia,7/9/1976,1976,Cosmos 839,co-orbital,0,0,0,–,0
+Russia,12/17/1976,1976,Cosmos 880,co-orbital,127,70,57,Still On Orbit,46.82
+Russia,5/23/1977,1977,Cosmos 909,co-orbital,0,0,0,–,0
+Russia,10/26/1977,1977,Cosmos 959,co-orbital,0,0,0,–,0
+Russia,12/21/1977,1977,Cosmos 967,co-orbital,0,0,0,–,0
+Russia,5/19/1978,1978,Cosmos 970,co-orbital,73,9,64,Still On Orbit,45.41
+Russia,4/18/1980,1980,Cosmos 1171,co-orbital,48,42,6,Still On Orbit,43.49
+Russia,2/2/1981,1981,Cosmos 1241,co-orbital,0,0,0,–,0
+Russia,6/18/1982,1982,Cosmos 1375,co-orbital,64,4,60,Still On Orbit,41.32
+Russia,11/20/1990,1990,None,co-orbital,0,0,0,–,0
+Russia,12/20/1991,1991,None,co-orbital,0,0,0,–,0
+Russia,12/26/1994,1994,None,co-orbital,27,3,24,Still On Orbit,28.79
+Russia,8/12/2014,2014,None,direct ascent,0,0,0,–,0
+Russia,4/22/2015,2015,None,direct ascent,0,0,0,–,0
+Russia,10/18/2015,2015,None,direct ascent,0,0,0,–,0
+Russia,5/25/2016,2016,None,direct ascent,0,0,0,–,0
+Russia,12/16/2016,2016,None,direct ascent,0,0,0,–,0
+Russia,3/26/2018,2018,None,direct ascent,0,0,0,–,0
+Russia,12/23/2018,2018,None,direct ascent,0,0,0,–,0
+Russia,6/14/2019,2019,None,direct ascent,0,0,0,–,0
+Russia,10/31/2019,2019,Cosmos 2535,co-orbital,30,14,16,Still On Orbit,0.93
+Russia,11/15/2019,2019,None,direct ascent,0,0,0,-,0
+Russia,4/15/2020,2020,None,direct ascent,0,0,0,-,0
+Russia,12/16/2020,2020,None,direct ascent,0,0,0,-,0
+Russia,4/21/2023,2023,None,direct ascent,0,0,0,-,0
+Russia,11/15/2021,2021,Cosmos 1408,direct ascent,1790,1490,300,Still On Orbit,1.88
+USA,9/22/1959,1959,None,direct ascent,0,0,0,–,0
+USA,10/13/1959,1959,Explorer VI,direct ascent,0,0,0,–,0
+USA,10/1/1961,1961,None,direct ascent,0,0,0,–,0
+USA,10/5/1961,1961,None,direct ascent,0,0,0,–,0
+USA,3/26/1962,1962,None,direct ascent,0,0,0,–,0
+USA,5/5/1962,1962,None,direct ascent,0,0,0,–,0
+USA,8/26/1962,1962,None,direct ascent,0,0,0,–,0
+USA,12/17/1962,1962,None,direct ascent,0,0,0,–,0
+USA,2/15/1963,1963,None,direct ascent,0,0,0,–,0
+USA,3/21/1963,1963,None,direct ascent,0,0,0,–,0
+USA,4/19/1963,1963,None,direct ascent,0,0,0,–,0
+USA,5/24/1963,1963,Agena D,direct ascent,0,0,0,–,0
+USA,1/4/1964,1964,None,direct ascent,0,0,0,–,0
+USA,2/14/1964,1964,Transit 2A Rocket Body,direct ascent,0,0,0,–,0
+USA,3/1/1964,1964,Unknown,direct ascent,0,0,0,–,0
+USA,4/21/1964,1964,Unknown,direct ascent,0,0,0,–,0
+USA,5/28/1964,1964,Unknown,direct ascent,0,0,0,–,0
+USA,11/16/1964,1964,Unknown,direct ascent,0,0,0,–,0
+USA,3/1/1965,1965,None,direct ascent,0,0,0,–,0
+USA,4/5/1965,1965,Transit 2A Rocket Body,direct ascent,0,0,0,–,0
+USA,6/30/1965,1965,None,direct ascent,0,0,0,–,0
+USA,1/13/1966,1966,None,direct ascent,0,0,0,–,0
+USA,3/30/1967,1967,Unknown piece of space debris,direct ascent,0,0,0,–,0
+USA,5/15/1968,1968,Unknown,direct ascent,0,0,0,–,0
+USA,11/21/1968,1968,Unknown,direct ascent,0,0,0,–,0
+USA,3/28/1970,1970,unknown satellite,direct ascent,0,0,0,–,0
+USA,1/21/1984,1984,None,direct ascent,0,0,0,–,0
+USA,11/13/1984,1984,Star,direct ascent,0,0,0,–,0
+USA,9/13/1985,1985,Solwind,direct ascent,287,287,0,5/9/2004,18.67
+USA,8/22/1986,1986,Star,direct ascent,0,0,0,–,0
+USA,9/5/1986,1986,Delta 2 R/B,co-orbital,17,17,0,4/14/1987,0.61
+USA,9/29/1986,1986,Star,direct ascent,0,0,0,–,0
+USA,2/20/2008,2008,USA 193,direct ascent,175,175,0,10/28/2009,1.69
+China,7/5/2005,2005,None known,direct ascent,0,0,0,–,0
+China,2/6/2006,2006,None known,direct ascent,0,0,0,–,0
+China,1/11/2007,2007,FengYun 1C,direct ascent,3536,750,2786,Still on Orbit,16.74
+China,1/11/2010,2010,CSS-X-11 (ballistic),direct ascent,0,0,0,–,0
+China,1/27/2013,2013,Unknown (ballistic),direct ascent,0,0,0,–,0
+China,5/13/2013,2013,None known,direct ascent,0,0,0,–,0
+China,7/23/2014,2014,Unknown (ballistic),direct ascent,0,0,0,–,0
+China,10/30/2015,2015,None known,direct ascent,0,0,0,–,0
+China,7/23/2017,2017,Unknown (ballistic),direct ascent,0,0,0,–,0
+China,2/5/2018,2018,CSS-5 (ballistic),direct ascent,0,0,0,–,0
+India,2/12/2019,2019,Microsat-R,direct ascent,0,0,0,–,0
+India,3/27/2019,2019,Microsat-R,direct ascent,130,130,0,6/14/2022,3.22

@@ -1,0 +1,419 @@
+---
+title: "Final Project_Exam"
+author: "Michael Tompkins"
+date: "2023-12-15"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = TRUE,
+	message = FALSE,
+	warning = FALSE
+)
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(reticulate)
+
+anes <- read_csv("anes.csv")
+```
+
+##Part One
+
+Question 1
+```{r, message=FALSE, warning=FALSE, paged.print=FALSE}
+wave_counts <- anes %>%
+  group_by(VCF0004) %>%
+  summarise(Number_of_Respondents = n())
+
+print(wave_counts)
+```
+
+Question 2
+```{python}
+import pandas as pd
+anes = pd.read_csv("anes.csv") 
+
+anes2 = anes.apply(pd.to_numeric,errors="coerce")
+
+anes2_1996 = anes2[anes2['VCF0004'] == 1996]
+region_distribution = anes2_1996['VCF0112'].value_counts()
+print(region_distribution)
+```
+
+Question 3
+
+2008: 4.05%
+2012: 3.80%
+2016: 1.48%
+2020: 0.83%
+```{r, message=FALSE, warning=FALSE, paged.print=FALSE}
+anes$Spanish <- anes$VCF0018a == 1
+
+anes_2008_onwards <- anes[anes$VCF0004 >= 2008, ]
+spanish_interviews_2008 <- aggregate(Spanish ~ VCF0004, data = anes_2008_onwards, FUN = mean) * 100
+
+print(spanish_interviews_2008)
+```
+
+Question 4
+```{python}
+import pandas as pd
+anes = pd.read_csv("anes.csv") 
+
+anes2 = anes.apply(pd.to_numeric,errors="coerce")
+
+presidents = {
+    1980: 'Jimmy Carter',
+    1982: 'Ronald Reagan',
+    1984: 'Ronald Reagan',
+    1986: 'Ronald Reagan',
+    1988: 'Ronald Reagan',
+    1990: 'George H. W. Bush',
+    1992: 'George H. W. Bush',
+    1994: 'Bill Clinton',
+    1996: 'Bill Clinton',
+    1998: 'Bill Clinton',
+    2000: 'Bill Clinton',
+    2002: 'George W. Bush',
+    2004: 'George W. Bush',
+    2006: 'George W. Bush',
+    2008: 'George W. Bush'
+}    
+
+filtered_data = anes2[(anes2['VCF0004'] >= 1980) & (anes2['VCF0004'] <= 2008) &
+                          (anes2['VCF0104'] == 2) & (anes2['VCF0101'] < 40)]
+
+valid_knowledge_responses = filtered_data[filtered_data['VCF0342'].isin([1, 2, 3, 4])]
+
+valid_knowledge_responses['VCF0004'] = valid_knowledge_responses['VCF0004'].map(presidents)
+
+knowledge_by_pres = valid_knowledge_responses.groupby('VCF0004')['VCF0342'].mean()
+
+print(knowledge_by_pres.idxmin()) 
+```
+
+Question 5
+```{r, message=FALSE, warning=FALSE, paged.print=FALSE}
+years_of_interest <- c(1980, 1992, 2000, 2020)
+anes_filtered <- filter(anes, VCF0004 %in% years_of_interest)
+
+# Removing 'don't know' responses and converting columns to numeric
+anes_filtered <- anes_filtered %>% 
+  filter(VCF0803 != 9) %>%
+  mutate(
+    VCF0803 = as.numeric(VCF0803),
+    VCF0110 = as.numeric(VCF0110),
+    VCF0105b = as.numeric(VCF0105b)
+  )
+
+calculate_average_ideology <- function(df, education_level, race = NULL) {
+  if (!is.null(race)) {
+    filtered_df <- filter(df, VCF0110 == education_level, VCF0105b == race)
+  } else {
+    filtered_df <- filter(df, VCF0110 == education_level)
+  }
+  return(mean(filtered_df$VCF0803, na.rm = TRUE))
+}
+
+# Calculating average ideology for each year, education level, and race
+results <- list()
+for (year in years_of_interest) {
+  year_data <- filter(anes_filtered, VCF0004 == year)
+  results[[as.character(year)]] <- list(
+    "College Degree or Greater" = list(
+      "Overall" = calculate_average_ideology(year_data, 4),
+      "White" = calculate_average_ideology(year_data, 4, 1),
+      "Non-White" = calculate_average_ideology(year_data, 4, 2)
+    ),
+    "No College Degree" = list(
+      "Overall" = calculate_average_ideology(year_data, 2),
+      "White" = calculate_average_ideology(year_data, 2, 1),
+      "Non-White" = calculate_average_ideology(year_data, 2, 2)
+    )
+  )
+}
+
+print(results)
+```
+
+Question 6
+
+There seems to be a slight pattern of increased social trust as party identity moves from Democrat to Republican.
+```{python}
+import pandas as pd
+anes = pd.read_csv("anes.csv")
+
+anes2 = anes.apply(pd.to_numeric, errors="coerce")
+
+anes_2004 = anes2[anes2['VCF0004'] == 2004].copy()
+
+social_trust_cols = ['VCF0619', 'VCF0620', 'VCF0621']
+party_identity_col = 'VCF0301'
+
+anes_2004['social_trust_scale'] = anes_2004[social_trust_cols].sum(axis=1, skipna=False) - anes_2004[social_trust_cols].sum(axis=1, skipna=False).min()
+
+grouped_data = anes_2004.groupby(party_identity_col)['social_trust_scale'].mean()
+
+print(grouped_data)
+```
+
+Question 7
+
+While there have been historical fluctuations, negative feelings toward opposite parties are exceptionally high as of the 2020 wave.
+```{r, message=FALSE, warning=FALSE, paged.print=FALSE}
+anes_data <- anes %>% 
+  select(VCF0004, VCF0302, VCF0218, VCF0224)
+
+anes_data <- anes_data %>% 
+  mutate(
+    VCF0302 = as.numeric(VCF0302),
+    VCF0218 = as.numeric(VCF0218),
+    VCF0224 = as.numeric(VCF0224)
+  )
+
+anes_data <- na.omit(anes_data)
+
+calculate_opposite_party_score <- function(df, party_id) {
+  if (party_id == 1) { # Republican
+    return(mean(df$VCF0218)) # Score towards Democratic party
+  } else if (party_id == 5) { # Democrat
+    return(mean(df$VCF0224)) # Score towards Republican party
+  } else {
+    return(NA) 
+  }
+}
+
+results <- list()
+for (year in unique(anes_data$VCF0004)) {
+  year_data <- filter(anes_data, VCF0004 == year)
+  results[[as.character(year)]] <- list(
+    "Republican" = calculate_opposite_party_score(year_data, 1),
+    "Democrat" = calculate_opposite_party_score(year_data, 5)
+  )
+}
+
+print(results)
+```
+
+
+## Part Two
+
+In this section, I will explore trends in voter registration and turnout. This issue has been in the news quite a lot in recent years, so further examination is relevant. The VCF0703 column contains summary data on this subject, which I will compare over time (VCF0004) and group by political party identity (VCF0301), age (VCF0101), and gender (VCF0104).
+
+The first question I would like to answer is how voter registration and turnout in the United States has changed over time. I will use each presidential administration as a data point for each value of VCF0703.
+
+The two standout figures in the resulting table below are the historically high voting percentage during the Obama elections and the historically high percentage of unregistered voters during the Nixon and Trump elections. Apart from those, there is fluctuation administration to administration.
+```{Python, message=FALSE, warning=FALSE, paged.print=FALSE}
+import pandas as pd
+
+anes_data = pd.read_csv("anes.csv", dtype={'VCF0703': str, 'VCF0301': str, 'VCF0104': str})
+
+relevant_vcf0703 = ['0', '1', '2']
+filtered_data = anes_data[anes_data['VCF0703'].isin(relevant_vcf0703)]
+
+grouped_data = filtered_data.groupby(['VCF0004', 'VCF0703']).size().unstack(fill_value=0)
+grouped_data['Total'] = grouped_data.sum(axis=1)
+for col in relevant_vcf0703:
+    grouped_data[f'Percent_{col}'] = (grouped_data[col] / grouped_data['Total']) * 100
+
+grouped_data = grouped_data.rename(columns={
+    'Percent_0': 'Pct_unregistered',
+    'Percent_1': 'Pct_reg_novote',
+    'Percent_2': 'Pct_voted'
+})
+
+presidents_data = pd.DataFrame({
+    'VCF0004': [1948, 1950, 1952, 1954, 1956, 1958, 1960, 1962, 1964, 1966, 1968, 1970, 1972, 1974, 1976, 1978, 1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020],
+    'President': [
+        "Harry S. Truman", "Harry S. Truman", 
+        "Dwight D. Eisenhower", "Dwight D. Eisenhower", "Dwight D. Eisenhower", "Dwight D. Eisenhower", 
+        "Dwight D. Eisenhower", "John F. Kennedy", "Lyndon B. Johnson", "Lyndon B. Johnson", "Lyndon B. Johnson", 
+        "Richard Nixon", "Richard Nixon", "Gerald Ford", "Gerald Ford", "Jimmy Carter", "Jimmy Carter", 
+        "Ronald Reagan", "Ronald Reagan", "Ronald Reagan", "Ronald Reagan", 
+        "George H. W. Bush", "George H. W. Bush", "Bill Clinton", "Bill Clinton", "Bill Clinton", "Bill Clinton", 
+        "George W. Bush", "George W. Bush", "George W. Bush", "George W. Bush", 
+        "Barack Obama", "Barack Obama", "Barack Obama", "Barack Obama", 
+        "Donald Trump", "Donald Trump"
+    ]
+})
+
+final_data = pd.merge(grouped_data.reset_index(), presidents_data, on='VCF0004')
+
+president_voter_data = final_data.groupby('President')[['Pct_unregistered', 'Pct_reg_novote', 'Pct_voted']].mean().reset_index()
+
+sorted_voter_data = president_voter_data.sort_values(by='President', ascending=False)
+
+print(sorted_voter_data)
+```
+Now, I will use this data to then stratify by the party identification of the respondent, seeking to answer the question of how political ideology may correlate to voter registration and turnout.
+
+Interestingly, the two highest percentages of unregistered voters are on the most extreme ends of the political spectrum. It can also be said that the highest percentages of voters reside on the extremes of the political spectrum, leaving the smallest percentages of registered voters not voting on the extremes as well. This makes sense due to strong feelings and identities.
+```{r, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(dplyr)
+
+anes_data <- read.csv("anes.csv", stringsAsFactors = FALSE)
+
+anes_data$VCF0703 <- as.character(anes_data$VCF0703)
+anes_data$VCF0301 <- as.character(anes_data$VCF0301)
+anes_data$VCF0101 <- as.numeric(anes_data$VCF0101)
+
+relevant_vcf0703 <- c('0', '1', '2')
+filtered_data <- subset(anes_data, VCF0703 %in% relevant_vcf0703)
+
+grouped_party_data <- filtered_data %>%
+  group_by(VCF0004, VCF0301, VCF0703, VCF0101) %>%
+  summarise(Count = n(), .groups = 'drop') %>%
+  spread(VCF0703, Count, fill = 0) %>%
+  mutate(Total = `0` + `1` + `2`,
+         Percent_0 = (`0` / Total) * 100,
+         Percent_1 = (`1` / Total) * 100,
+         Percent_2 = (`2` / Total) * 100) %>%
+  select(VCF0004, VCF0301, VCF0101, Percent_0, Percent_1, Percent_2)
+
+filtered_final_party_data <- grouped_party_data %>% 
+  filter(VCF0301 != "0")
+
+vcf0301_party_data <- filtered_final_party_data %>%
+  group_by(VCF0301) %>%
+  summarise(
+    Avg_Pct_Unregistered = mean(Percent_0, na.rm = TRUE),
+    Avg_Pct_Reg_Novote = mean(Percent_1, na.rm = TRUE),
+    Avg_Pct_Voted = mean(Percent_2, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+print(vcf0301_party_data)
+
+```
+From here, I will introduce age group as a metric to gauge voter registration and participation over time.
+
+As the heatmaps show, the percentage of unregistered voters has increased in the last two elections across all age groups. Additionally, as could be guessed, there is a pattern of greater turnout among young people and the election of a democratic president, as can be seen with the elections of Clinton, Obama, and Biden.
+```{r, message=FALSE, warning=FALSE, paged.print=FALSE}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+
+anes_data$VCF0703 <- as.character(anes_data$VCF0703)
+anes_data$VCF0301 <- as.character(anes_data$VCF0301)
+anes_data$VCF0101 <- as.numeric(anes_data$VCF0101)
+
+anes_data <- anes_data %>% filter(VCF0101 >= 18)
+
+relevant_vcf0703 <- c('0', '1', '2')
+filtered_data <- subset(anes_data, VCF0703 %in% relevant_vcf0703)
+
+presidents_data <- data.frame(
+  VCF0004 = c(1948, 1950, 1952, 1954, 1956, 1958, 1960, 1962, 1964, 1966, 1968, 1970, 1972, 1974, 1976, 1978, 1980, 1982, 1984, 1986, 1988, 1990, 1992, 1994, 1996, 1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020),
+  President = c("Harry S. Truman", "Harry S. Truman", "Dwight D. Eisenhower", "Dwight D. Eisenhower", "Dwight D. Eisenhower", "Dwight D. Eisenhower", "Dwight D. Eisenhower", "John F. Kennedy", "Lyndon B. Johnson", "Lyndon B. Johnson", "Lyndon B. Johnson", "Richard Nixon", "Richard Nixon", "Gerald Ford", "Gerald Ford", "Jimmy Carter", "Jimmy Carter", "Ronald Reagan", "Ronald Reagan", "Ronald Reagan", "Ronald Reagan", "George H. W. Bush", "George H. W. Bush", "Bill Clinton", "Bill Clinton", "Bill Clinton", "Bill Clinton", "George W. Bush", "George W. Bush", "George W. Bush", "George W. Bush", "Barack Obama", "Barack Obama", "Barack Obama", "Barack Obama", "Donald Trump", "Donald Trump")
+)
+
+grouped_party_data <- filtered_data %>%
+  group_by(VCF0004, VCF0301, VCF0703, VCF0101) %>%
+  summarise(Count = n(), .groups = 'drop') %>%
+  spread(VCF0703, Count, fill = 0) %>%
+  mutate(Total = `0` + `1` + `2`,
+         Percent_0 = (`0` / Total) * 100,
+         Percent_1 = (`1` / Total) * 100,
+         Percent_2 = (`2` / Total) * 100) %>%
+  select(VCF0004, VCF0301, VCF0101, Percent_0, Percent_1, Percent_2)
+
+
+
+final_party_data <- left_join(grouped_party_data, presidents_data, by = "VCF0004")
+
+filtered_final_party_data <- final_party_data %>% 
+  filter(VCF0301 != "0")
+
+president_party_data <- filtered_final_party_data %>%
+  group_by(President, VCF0301, VCF0101) %>%
+  summarise(
+    Avg_Pct_Unregistered = mean(Percent_0, na.rm = TRUE),
+    Avg_Pct_Reg_Novote = mean(Percent_1, na.rm = TRUE),
+    Avg_Pct_Voted = mean(Percent_2, na.rm = TRUE),
+    .groups = 'drop'
+  )
+
+president_party_data$President <- factor(president_party_data$President, levels = unique(presidents_data$President))
+
+sorted_party_data <- president_party_data %>%
+  arrange(desc(President))
+
+president_party_data <- president_party_data %>%
+  mutate(VCF0101 = as.numeric(VCF0101)) %>%
+  na.omit()
+
+president_party_data <- president_party_data %>%
+  mutate(VCF0101 = as.numeric(VCF0101)) %>%
+  na.omit() %>%
+  mutate(age_group = cut(VCF0101, breaks = c(18, 30, 40, 50, 60, 70, 80, 90, 100), include.lowest = TRUE, right = FALSE, labels = c("18-29", "30-39", "40-49", "50-59", "60-69", "70-79", "80-89", "90-99")))
+
+ggplot(president_party_data, aes(x = President, y = age_group, fill = Avg_Pct_Unregistered)) +
+  geom_tile() +  
+  scale_fill_gradient(low = "blue", high = "red") +  
+  theme_minimal() +
+  labs(title = "Heatmap of Unregistered Voter Percentage by President and Age Group",
+       x = "President",
+       y = "Age Group",
+       fill = "Percent Unregistered") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(president_party_data, aes(x = President, y = age_group, fill = Avg_Pct_Reg_Novote)) +
+  geom_tile() +  
+  scale_fill_gradient(low = "blue", high = "red") + 
+  theme_minimal() +
+  labs(title = "Heatmap of Registered Non-voter Percentage by President and Age Group",
+       x = "President",
+       y = "Age Group",
+       fill = "Percent Registered Without Voting") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(president_party_data, aes(x = President, y = age_group, fill = Avg_Pct_Voted)) +
+  geom_tile() +  
+  scale_fill_gradient(low = "blue", high = "red") +  
+  theme_minimal() +
+  labs(title = "Heatmap of Voter Percentage by President and Age Group",
+       x = "President",
+       y = "Age Group",
+       fill = "Percent Voted") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Finally, instead of age group, I will look at patterns associated with voter registration/turnout and gender.
+
+It seems that male and female are generally well-aligned, with women one percent higher in voter registration/turnout than men. I am leaving out "Other" due to its relatively recent introduction in 2016, giving this category only two data points.
+
+```{Python message=FALSE, warning=FALSE, paged.print=FALSE}
+import pandas as pd
+
+anes_data = pd.read_csv("anes.csv", dtype={'VCF0703': str, 'VCF0301': str, 'VCF0104': str})
+
+relevant_vcf0703 = ['0', '1', '2']
+filtered_data = anes_data[anes_data['VCF0703'].isin(relevant_vcf0703)]
+
+grouped_data = filtered_data.groupby(['VCF0104', 'VCF0703']).size().unstack(fill_value=0)
+grouped_data['Total'] = grouped_data.sum(axis=1)
+
+for col in relevant_vcf0703:
+    grouped_data[f'Percent_{col}'] = (grouped_data[col] / grouped_data['Total']) * 100
+
+grouped_data = grouped_data.rename(columns={
+    'Percent_0': 'Pct_unregistered',
+    'Percent_1': 'Pct_reg_novote',
+    'Percent_2': 'Pct_voted'
+})
+
+vcf0104_data = pd.DataFrame({
+    'VCF0104': ['1', '2', '3'],
+    'Gender': ['Male', 'Female', 'Other']
+})
+
+final_data = pd.merge(grouped_data.reset_index(), vcf0104_data, on='VCF0104')
+
+vcf0104_voter_data = final_data.groupby('Gender')[['Pct_unregistered', 'Pct_reg_novote', 'Pct_voted']].mean().reset_index()
+
+sorted_voter_data = vcf0104_voter_data.sort_values(by='Gender', ascending=False)
+
+print(sorted_voter_data)
+```

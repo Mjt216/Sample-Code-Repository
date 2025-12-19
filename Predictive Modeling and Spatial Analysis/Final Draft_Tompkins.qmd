@@ -1,0 +1,358 @@
+---
+title: "More Rights, Lower Profits: A Spatial Analysis of the Profitability of Industrial Fishing under Forced Labor Reductions"
+author: "Michael Tompkins"
+bibliography: capstone_bib_roughDraft.bib
+csl: american-political-science-association.csl
+abstract: >
+  The industrialization of global fisheries has enabled massive extraction of marine resources but at significant ecological and human costs. Industrial fishing, largely driven by distant-water fleets from high-income countries, relies heavily on government subsidies, underreported catch and exploitative labor practices. Illegal, Unreported, and Unregulated (IUU) fishing persists in part due to weak governance, flag-of-convenience regimes, and limited transparency. Forced labor has emerged as a key cost-reduction strategy among fleets operating with narrow profit margins. This paper investigates how the profitability of industrial fishing would change under improved labor rights enforcement.  Building on economic and labor rights risk models by Sala et al. (2018) and McDonald et al. (2021), and incorporating geospatial data from Global Fishing Watch, the study uses vessel-level economic modeling and spatial interpolation to estimate spatial variability in fishing profitability in response to increased labor compliance. The results indicate that improved labor standards would substantially reduce profitability for fleets in certain areas, especially those dominated by distant-water operations and by fleets with high risks of labor rights violations. These findings highlight the potential for targeted labor enforcement to serve as a powerful tool for reducing overexploitation of fisheries, combating IUU fishing, and simultaneously advancing both conservation and human rights objectives in fisheries policy.
+
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    linestretch: 2
+    papersize: letter
+    margin-left: 1in
+    margin-right: 1in
+    margin-top: 1in
+    margin-bottom: 1in
+    cap-location: top
+    include-before: |
+      \clearpage
+
+header-includes:
+  - \usepackage{indentfirst}
+  - \setlength{\parindent}{20pt}
+  - \usepackage{pdfpages}
+  - \usepackage{amsmath}
+
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+<!-- CSS to center chart -->
+::: {.cell}
+```{=html}
+<style>
+.center-widget-output .cell-output-display {
+  display: flex;
+  justify-content: center;
+}
+
+.center-widget-output .html-widget {
+  width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+</style>
+```
+:::
+
+\clearpage
+
+\raggedright
+
+\setlength{\parindent}{20pt}
+
+# Introduction
+
+Since the mid-twentieth century, the boom in industrial fishing on the world’s oceans has resulted in dramatic decline in the biomass and biodiversity of many fish species [@RefWorks:mansfield2010global]. Aquatic animals constitute 20% or more of animal protein intake for over one third of the global population. In some countries, this number is more than 50% of animal protein intake. To meet this need, approximately 110 million metric tons of fish are caught on the world's oceans annually, equating to a value of more than 171 billion USD [@RefWorks:mccauley2018wealthy]. Extracting these quantities of marine life from the oceans necessitates a vast network of an estimated 4.1 million fishing vessels. The Chinese fleet – the world’s largest – boasts approximately 564,000 vessels [@RefWorks:fao2022state]. While the majority of fishing vessels are still small, fleets of large industrial vessels with high-tech fishing gear are having an outsized impact on fish stocks. Of the 4.1 million total fishing vessels globally, about 45,000 are considered ‘large vessels’ (length overall greater than or equal to 24m and usually over 100 gross tonnage) by the Food and Agriculture Organization of the United Nations [@RefWorks:fao2022state]. 
+  
+Having over-fished their own national waters, some countries have resorted to large distant-water fleets that harvest massive quantities of fish on the high seas – all areas of the ocean that are not part of any country’s exclusive economic zone (EEZ), territorial sea, internal waters, or the archipelagic waters of an archipelagic country [@RefWorks:belhabib2020catching;@RefWorks:sapsford2022high]. China, for example, built a 3,000-vessel-strong industrial fishing fleet that depleted Chinese fisheries. Seeking new stocks, the fleet has fanned out across the globe, fishing in every ocean at a scale that puts to shame some countries’ entire fleets fishing in their own waters [@RefWorks:myers2022china]. Including China, 97% of tracked industrial fishing activity on the high seas is conducted by vessels flagged - registered - to higher-income countries [@RefWorks:mccauley2018wealthy].
+  
+The industrialization of fishing has come at a cost, both ecologically and economically. Compared to the 1950’s, twice the amount of effort is required to catch the same volume of fish, leading to subsidization of the industry and to exploitive strategies by the industry itself [@RefWorks:tickler2018modern]. As of 2018, 78% of tracked industrial fishing activity in the marine Exclusive Economic Zones (EEZs) of lower-income countries can be attributed to vessels flagged to higher-income countries [@RefWorks:mccauley2018wealthy]. Some of the fishing activity within EEZs by foreign fleets is legal and done with the knowledge and permission of the host nation. Other fishing activity both within EEZs and on the high seas is considered Illegal, Unreported, and Unregulated (IUU) fishing. The U.S. National Oceanic and Atmospheric Administration (NOAA) defines IUU fishing as follows:
+
+::: {.blockquote}
+
+```{=latex}
+\begingroup
+\setstretch{1}
+
+\leftskip=20pt
+
+\noindent\textbf{Illegal fishing} refers to fishing activities conducted in contravention of applicable laws and regulations, including those laws and rules      adopted at the regional and international level.
+
+\hangindent=40pt
+\hangafter=1
+\par\textbf{Unreported fishing} refers to fishing activities that are not reported or are misreported to relevant authorities in contravention of national laws   and regulations or reporting procedures of a relevant regional fisheries management organization.
+
+\hangindent=40pt
+\hangafter=1
+\par\textbf{Unregulated fishing} occurs in areas or for fish stocks for which there are no applicable conservation or management measures and where such fishing activities are conducted in a manner inconsistent with State responsibilities for the conservation of living marine resources under international law. Fishing    activities are also unregulated when occurring in an [regional fisheries management organization (RFMO)]-managed area and conducted by vessels without nationality, or by those flying a flag of a State or fishing entity that is not party to the RFMO in a manner that is inconsistent with the conservation measures of that RFMO. (NOAA n.d.)
+
+\endgroup
+```
+:::
+
+Today, IUU fishing is facilitated by organized crime networks, flag‑of‑convenience regimes, and systemic corruption, resulting in substantial economic losses for developing nations, estimated between $2–15 billion USD annually [@RefWorks:liddick2014dimensions]. An international push for transparency is beginning to bear fruit, with the Panamanian Ministry of the Environment signing an agreement with NGO Global Fishing Watch to work together to share data on fisheries and fishing activity [@RefWorks:zaganelli2025ocean].
+  
+While Panama is proving itself as a model for the rest of the world in ocean conservation, fisheries transparency is still a novel idea and capability. The lack of transparency in industrial fishing, coupled with narrowing profit margins and the simple fact that fleets spend much of their time outside of national jurisdictions, has led to widespread labor trafficking [@RefWorks:moreto2020convergence]. Living and working conditions aboard fishing vessels are often left in an unsafe and unsanitary state in pursuit of higher profits. Abusive and illegal conditions include, “financial exploitation; poor health care, food and accommodation; poor vessel safety; verbal and physical abuse; incarceration; and abandonment,” [@RefWorks:ejf2010abuse]. As labor rights, enforcement capabilities, and corruption rates vary county-to-country, addressing these issues is anything but a simple matter. 
+
+Nonetheless, this paper aims to conduct a spatial analysis to predict how profitability in high-seas fishing operations would change under increased labor rights enforcement. Drawing upon existing economic and risk models, the analysis will account for geographic variability in profit margins, particularly the effect of distance from home port and labor cost differentials by flag and/or owner state. By estimating how enforcement of labor rights impacts profitability in specific ocean regions, this paper is intended to help inform international labor and fisheries policy, port-state measures, and economic strategies for sustainable ocean governance.
+
+# Literature Review & Theoretical Framework
+
+## An Economic Model for Commercial Fishing
+
+  In 2018, the article "The economics of fishing the high seas", by Sala et al., posited an economic model for commercial fishing using satellite data and machine learning. Until recently, distant-water fishing fleets, particularly those on the high seas, proved exceedingly difficult to track. Thanks to new datasets and machine learning, vessel positions *and their activities* can be gleaned on a global scale. 
+
+  Sala et al. (2018) found that several factors deeply affect the profitability of fishing on the high seas. Government subsidies can mean the difference between profit and loss for a fleet in many countries and are particularly central to profitability of the Japanese and Spanish fleets. The Chinese, Taiwanese, and Russian fleets as a whole would also not be profitable without government subsidies [@RefWorks:sala2018economics]. In fact, other studies have shown that the global landed value of catch is equaled at a rate of 30%-40% by subsidies [@RefWorks:sumaila2016global]. Secondly, underreporting of catch results in an underestimation of profits. Reconstructed catch data show that the worldwide catch is up to 30% larger than the catch reported to FAO [@RefWorks:sala2018economics]. Thirdly, the use of refueling and transshipping of catch by support vessels – reefers and bunkers – allows fishing vessels to stay at sea for months and even years at a time [@RefWorks:sala2018economics; @RefWorks:ewell2017potential].
+
+  A fourth factor in fishing profitability that is particularly key to this paper is the use of forced labor and modern slavery. This encompasses both at sea through forced labor and on land through child slavery. Sala et al. (2018) showed that the Chinese and Taiwanese high seas fishing fleets are only profitable after assumptions of both government subsidies and low labor costs. 
+
+## Economic Drivers of IUU Fishing
+
+  In his article “Economic Drivers of Illegal, Unreported and Unregulated (IUU) Fishing,” Carl-Christian Schmidt argues that IUU fishing is primarily driven by economic incentives – specifically, the balance of expected profits versus expected costs (Schmidt 2005). Drawing on economic theory, particularly Becker’s model of crime and punishment, the paper frames IUU fishing as a rational response to a weakly enforced global regulatory framework. Key economic variables, such as excess vessel capacity, high market prices for IUU-targeted species (like toothfish and tuna), and weak surveillance regimes, all contribute to the profitability of illegal activity. Therefore, policy responses must either reduce the expected benefits (e.g., through catch documentation and market restrictions) or increase the costs (e.g., through higher fines, improved monitoring, and international cooperation) (Schmidt 2005).
+
+  This economic framing directly extends traditional commercial fishing models by shifting the lens from legal harvesting optimization to illicit profit-seeking behavior [@RefWorks:schmidt2005economic]. While conventional models consider fish stock dynamics and economic returns within regulated markets, Schmidt highlights how weak governance allows rational actors to bypass rules in pursuit of higher returns. The drivers of IUU fishing mirror market failures seen in open-access fisheries but are exacerbated by institutional loopholes like flag-of-convenience states and fragmented jurisdiction (Schmidt 2005). By integrating economic cost-benefit logic into IUU analyses, Schmidt suggests that enforcement policies should be designed not merely to regulate effort or quota but to shift the profit calculus of would-be violators [@RefWorks:schmidt2005economic].
+
+  Importantly, the article also anticipates and bridges into the discussion of illegal labor practices in fishing. Schmidt emphasizes that many IUU vessels operate under dangerous and exploitative labor conditions, often employing low-cost labor from impoverished regions with few employment alternatives [@RefWorks:schmidt2005economic]. This not only reduces vessel operating costs but reflects broader structural inequalities; economic desperation and lack of labor standards enforcement enable IUU fishing to thrive. He points out that policy interventions must also address these labor dynamics by improving economic opportunities in coastal communities and integrating labor protections into international fisheries governance [@RefWorks:schmidt2005economic]. This labor-exploitation dimension shows that IUU fishing is not only an economic crime against resource sustainability but also a human rights issue.
+
+## Illegal Labor Practices in Industrialized Fishing
+
+  Reports have shown that illegal labor practices are prevalent in the fishing industry, in particular aboard IUU vessels. According to the Environmental Justice Foundation (2010), crew members aboard IUU vessels have reported beatings, sleep deprivation, imprisonment without food or water, forced to work after injury, and murder. Travel documents are also frequently withheld, and cases of abandonment are also documented [@RefWorks:ejf2010abuse]. One study showed that risk areas at sea for labor abuse are linked to flag states that have little control of corruption, vessels owned by entities outside the flag state, and Chinese-flagged vessels [@RefWorks:selig2022revealing]. 
+
+::: {#fig-slavery layout-ncol=2}
+
+![National prevalence of slavery](Prevalence_of_slavery_map.png){#fig-map}
+
+![Prevalence of slavery versus mean landed value](slavery_landedValue_chart.png){#fig-plot}
+
+Source: Tickler et al. (2018)
+:::
+
+## Mapping the Extent of Illegal Labor Practices
+
+  McDonald et al. (2021) employ satellite data and machine learning to map the global prevalence of forced labor aboard fishing vessels. By analyzing automatic identification system (AIS) movement patterns, the authors identify high-risk vessels. They found, for instance, that over 75% of squid-jigger and more than 50% of longline vessels exhibited movement behaviors strongly correlated with forced labor [@RefWorks:mcdonald2021satellites]. This method provides robust empirical evidence confirming that exploitative labor is spatially widespread and operationally systematic, rather than isolated or anecdotal.
+
+  The findings directly tie into the broader economic logic underpinning IUU fishing, as forced labor emerges as a cost-cutting adaptation to declining profits and stricter regulations. As vessel operators face diminishing margins under increased enforcement, they respond by cutting labor costs through coercive means, mirroring how regulation shapes economic behavior in fishing markets. This illustrates how labor exploitation is structurally integrated into the operational strategies of high-risk fleets—a dynamic forced by both market pressures and regulatory incentives [@RefWorks:mcdonald2021satellites].
+
+  McDonald et al. (2021) offer important insights into how regulation and enforcement dynamically alter the economic landscape of fishing. The authors highlight that labor exploitation can act as a substitute for other compliance costs, effectively becoming a hidden mechanism that allows fleets to maintain profitability when catch limits, surveillance, or subsidies change [@RefWorks:mcdonald2021satellites]. Thus, understanding how forced labor functions as a strategic economic response not only bolsters the literature on regulatory adaptation in fisheries economics but also underscores the importance of integrating labor standards into enforcement and economic policy frameworks.
+  
+Swartz et al. (2021) critique McDonald et al.’s AIS-based profiling model for identifying forced labor at sea, citing a small training dataset, improper data partitioning, and the risk of false positives that could unjustly target vessels or stigmatize crews. They question the model’s predictive validity and call for more robust verification and transparency. In response, McDonald et al. (2021) acknowledge these concerns, clarifying that their aim was to develop a predictive, not causal, tool constrained by limited data. They emphasize the need for further validation and integration with other enforcement methods, framing the model as a starting point for identifying high-risk vessels rather than a standalone solution.
+
+## Economic Effects of the Improvement and Enforcement of Labor Conditions
+
+Improving labor rights in fisheries, particularly through instruments like ILO Convention C188 and enhanced port inspections, has begun to shift the economic calculus for vessel operators. Compliance with labor standards, including regulated work hours, written contracts, and adequate living conditions, introduces new costs that reduce the appeal of exploitative practices. However, these reforms can also unlock economic benefits: seafood certified as responsibly harvested under safe labor conditions is more likely to meet stringent import regulations and can access higher-value markets, particularly in the EU and U.S. (ILO 2020). Countries failing to demonstrate labor compliance risk trade sanctions, such as the EU “yellow card,” which can significantly disrupt exports (ILO 2020).
+
+These shifts incentivize vessel operators to weigh the short-term costs of labor improvements against long-term gains in market access, reputational stability, and reduced enforcement risk. In Thailand, for example, reforms linked to digital wage payments, port inspections, and grievance mechanisms not only improved working conditions but helped restore the country’s standing in global seafood trade [@RefWorks:ilo2020ship]. The economic realignment driven by labor reform demonstrates how governance efforts targeting working conditions can reshape fishing economics—rewarding compliance while raising the operational risks and costs of maintaining illegal or informal practices [@RefWorks:ilo2020ship].
+
+# Data & Methods
+
+  The economic model for this paper is based on individual fishing vessels. Fishing effort is derived from Global Fishing Watch’s "AIS Apparent Fishing Effort" dataset, which uses machine learning to determine if a vessel is engaged in fishing behavior at a particular AIS transmission position [@RefWorks:gfw2025ais]. Encounter events with support vessels - carrier vessels to transport catch to port and bunker vessels to refuel – are taken from Global Fishing Watch’s "Carrier Vessel Portal" events dataset [@RefWorks:gfw2025carrier]. 
+  
+  To predict the economic effects of a reduction in labor trafficking in industrial fishing, I first needed to create an economic model for fishing vessels. To accomplish this, I based my model on the one created by Sala et al. (2018). Just as in their model, I parsed fuel costs and labor costs to calculate total fishing costs, as well as catch revenue to calculate total fishing revenue. Fishing profits were estimated by subtracting total fishing costs from total fishing revenue. Deviating from Sala et al. (2018), I did not factor in subsidies as part of fishing revenue for this paper due to time and resource constraints. The exclusion of subsidies may affect this model's results and accuracy. Further research should seek to include subsidies in the model to increase the accuracy of results.
+  
+## Vessel Identification
+
+  Each vessel was identified by its unique MMSI number, as well as its flag and beneficial owner states via a Global Fishing Watch dataset of approximately 35,000 fishing and fishing support vessels [@RefWorks:gfw2025park]. Further information on each vessel, such as gear type, length, tonnage, engine power, auxiliary engine power, and crew size, was sourced from McDonald et al. (2021). McDonald et al. (2021) used Global Fishing Watch's neural net to infer gear type if registry data was missing for a vessel. McDonald et al. (2021) also used random forests to predict auxiliary engine power - using vessel length, engine power, and gear type - and crew size - using vessel length, engine power, gear type, and flag state.
+  
+  As Sala et al. (2018) did in their model, I estimated vessel design speed as the following:
+
+$$
+S_{design} = 10.4818 + 1.2 \times 10^{-3} \times \text{Engine Power} -3.84 \times 10^{-8} \times \text{Engine Power}^2
+$$
+
+where engine power is in kW and design speed in knots (𝑅2=0.42; p−value<0.01). The resulting average design speed calculated for fishing and fishing support vessels was 11 and 11.8 knots respectively, close to the average of 11.5 knots reported by the International Maritime Organization.
+
+  When available - as was the case for China, EU member states, Iceland, Norway, South Korea, and Russia - I used country-specific Specific Fuel Consumption (SFC). For SFC of vessels from countries for which there is no available data, vessel length was used as the determining factor (240 for vessels <12 meters, 220 for vessels between 12-24 meters, and 180 for vessels over 24 meters).
+  
+## Fishing Effort
+
+  Fishing effort data was derived from Global Fishing Watch's AIS Apparent Fishing Effort dataset for 2012 to 2018, which uses deep learning to predict fishing activity by a vessel based on AIS data [@RefWorks:gfw2025ais]. I calculated the amount of time spent fishing for each vessel during that time period by finding the total length of time the vessel was transmitting AIS signals. I excluded positions where a vessel was 1 km or less from shore or traveling at less than 0.1 knots. To calculate the energy used by each vessel for fishing effort, I multiplied the number of hours spent fishing by the vessel's engine power. This resulted in energy expended in kilowatt-hours. 
+  
+  I removed noise by filtering out invalid coordinates, such as nonexistent coordinates (e.g. >90°S) or coordinates that correspond to an area on land. To account for gaps in AIS coverage, defined as more than 24 hours with no AIS transmission more than 100 nautical miles from shore, I applied the same gap correction by flag state and gear type as Sala et al. (2018) to account for the unobserved effort. I then assigned time spent fishing by each vessel to a 0.5° spatial grid cell.
+
+## Fishing Costs
+
+Fishing costs are divided into fuel costs, labor costs, and miscellaneous costs. Fuel costs were calculated by multiplying engine power, hours fished, specific fuel consumption (SFC), and fuel price. Engine power estimates were derived from the McDonald et al. (2021) dataset. I calculated SFC—the amount of fuel consumed per unit of power per hour (g/kWh)—using supplementary materials provided by Sala et al. (2018). I utilized annual averages of global fuel prices, which were calculated with daily data of the price of MGO (\$/metric ton) obtained from the Bunker Index—as reported by the U.S. Department of Agriculture [@RefWorks:usdadaily]. Fuel costs of auxiliary engines were also added to main engine fuel cost using the same formula. Auxiliary engine power, typically 24% or 47% of main engine power, was also provided by McDonald et al. (2021).
+
+The formulas for main and auxiliary fuel costs per vessel are:
+$$
+C_{\mathrm{fuel}} = P_{\mathrm{main}} \times H_{\mathrm{adj}} \times \frac{\mathrm{SFC}_{\mathrm{main}}}{1000} \times \mathrm{Price}_{\mathrm{fuel}}
+$$
+$$
+C_{\mathrm{aux\_fuel}} = P_{\mathrm{aux}} \times H_{\mathrm{adj}} \times \frac{\mathrm{SFC}_{\mathrm{aux}}}{1000} \times \mathrm{Price}_{\mathrm{fuel}}
+$$
+where $P_{\mathrm{main}}$ and $P_{\mathrm{aux}}$ are main and auxiliary engine power (kW), $H_{\mathrm{adj}}$ is adjusted fishing hours, $\mathrm{SFC}$ is specific fuel consumption (g/kWh), and $\mathrm{Price_{fuel}}$ is the fuel price in USD/kg.
+
+Auxiliary engine power ($P_{\mathrm{aux}}$) was estimated as:
+$$
+P_{\mathrm{aux}} =
+\begin{cases}
+0.24 \times P_{\mathrm{main}}, & \text{if vessel is Bunker/Reefer/Cargo} \\
+0.47 \times P_{\mathrm{main}}, & \text{if fishing vessel}
+\end{cases}
+$$
+Observed fishing hours ($H$) were adjusted for coverage and reporting gaps:
+$$
+H_{\mathrm{adj}} = H \times S_{\mathrm{gap}} \times S_{\mathrm{cover}}
+$$
+where $S_{\mathrm{gap}}$ and $S_{\mathrm{cover}}$ are adjustment multipliers by flag and data coverage.
+
+Labor costs were calculated by multiplying time spent fishing, wage rates, crew size for each vessel, and risk adjustment factor. Average daily wage rates for fisheries workers by country were obtained from the International Labour Organization [@RefWorks:ilo2025average]. The risk adjustment factor ($r$)represents the probability that wages are enforced for a given vessel’s flag state, scaling labor costs based on the risk predictions of the machine learning model used in McDonald et al. (2021). The $r$ value assigned to each vessel represents the inverse average risk of labor rights violations by year and flag state. The labor cost for each vessel is calculated as:
+$$
+C_{\mathrm{labor,low}} = W \times N \times 12 \times r
+$$
+$$
+C_{\mathrm{labor,high}} = W \times N \times 12 \times 1.0
+$$
+where $W$ is the monthly wage (USD), $N$ is the crew size, and $r$ is a risk adjustment factor based on the probability of wage enforcement. $C_{\mathrm{labor,low}}$ represents the labor cost calculation for the status quo and $C_{\mathrm{labor,high}}$ represents the labor cost calculation for increased labor rights enforcement. The $r$ value is set to 1.0 for all vessels in the $C_{\mathrm{labor,high}}$ function to represent full payment of wages.
+
+Total fishing cost, following Sala et al. (2018), was calculated as:
+$$
+C_{\mathrm{total,low}} = C_{\mathrm{fuel}} + C_{\mathrm{aux\_fuel}} + C_{\mathrm{labor,low}} + C_{\mathrm{crew,low}}
+$$
+$$
+C_{\mathrm{total,high}} = C_{\mathrm{fuel}} + C_{\mathrm{aux\_fuel}} + C_{\mathrm{labor,high}} + C_{\mathrm{crew,high}}
+$$
+where $C_{\mathrm{crew,low}}$ and $C_{\mathrm{crew,high}}$ are the labor costs further adjusted by days active and crew size. Sala et al. (2018) calculated that fuel and labor costs combined account for 43–47% of total fishing cost. A total of the other remaining costs of fishing, such as depreciation, repair, and maintenance, were determined using this figure for each vessel.
+
+## Fishing Catch and Revenue Calculation
+
+I used FishStat data from the Food and Agriculture Organization of the United Nations (FAO) to obtain the amount of fish caught annually in tonnes by each flag state [@RefWorks:2025statistical]. I then combined this data with Sea Around Us catch reconstruction data [@RefWorks:pauly2025sea]. Sea Around Us is a partnership among the University of British Columbia, the University of Western Australia, The Pew Charitable Trusts, and The Paul G. Allen Family Foundation that performs catch reconstructions, which estimate catch using a combination of official data, additional data, and interpolation [@RefWorks:pauly2015catch]. I used both datasets to calculate the value of catch in USD per tonne by flag state and year.
+
+The country-year total catch in tonnes ($Q_{c,y}$) is allocated to each vessel by its share of adjusted fishing effort:
+$$
+\text{effort share}_i = \frac{H_{\mathrm{adj},i}}{\sum_{j \in (c,y)} H_{\mathrm{adj},j}}
+$$
+$$
+Q_{\mathrm{vessel},i} = Q_{c,y} \times \text{effort share}_i
+$$
+Landed value per tonne ($V_{\text{per\_tonne}}$) is imputed from country or global means as necessary:
+$$
+V_{\text{per\_tonne}} =
+\begin{cases}
+\frac{\text{landed value}}{\text{tonnes}}, & \text{if available} \\
+\text{country mean}, & \text{if available} \\
+\text{global mean}, & \text{otherwise}
+\end{cases}
+$$
+Vessel-level revenue is calculated as:
+$$
+R_i = Q_{\mathrm{vessel},i} \times V_{\text{per\_tonne}}
+$$
+
+## Fishing Profit Calculation
+
+To calculate fishing profits per vessel, I used the basic equation of profit as revenue minus total cost:
+$$
+Profit_{\mathrm{low},i} = R_i - C_{\mathrm{total,low},i}
+$$
+$$
+Profit_{\mathrm{high},i} = R_i - C_{\mathrm{total,high},i}
+$$
+  I accounted for under-observation of AIS coverage and gaps in fishing effort data by using scaling factors as calculated by Sala et al. (2018). I then allocated profit figures to the 0.5° spatial grid cells proportionally to fishing effort share per vessel-cell-year.
+
+  For each profit value per vessel-cell-year, I calculated an upper and lower bound for profit based on the enforcement of minimum wage for fisheries and agriculture workers in that flag state using the ILO dataset. From these figures, I calculated the percent change in overall profit for each vessel-cell-year:
+$$
+\text{Percent Change} = \frac{Profit_{\mathrm{high},i} - Profit_{\mathrm{low},i}}{|Profit_{\mathrm{low},i}|} \times 100
+$$
+Finally, I combined these findings with a dataset of the country of beneficial ownership, distinct from flag country, for approximately 35,000 vessels [@RefWorks:gfw2025park]. This allowed me to determine percent change in profit for each vessel-cell-year by country to which the profits would ultimately be directed.
+
+## Interpolation Methods
+
+To visualize and analyze the spatial distribution of changes in fishing fleet profitability under increased labor rights enforcement, I employed Inverse Distance Weighted (IDW) interpolation. IDW is a deterministic interpolation method that estimates values at unsampled locations as a weighted average of values from nearby sampled points, where the influence of each point diminishes with distance. This method assumes that locations closer to a prediction site are more similar than those farther away. IDW is able to estimate values within the extent of the latitude and longitude of the input data. For example, IDW run on a data sample with a maximum latitude of 40° N will necessarily have a limit of 40° N in the output.
+
+The output cell size was set to 0.5 degrees to match the spatial resolution of the original grid. For each analysis scenario, I applied an ocean mask to constrain interpolation results to oceanic areas, thereby excluding landmasses from the final surface. The resulting rasters display a continuous raster surface of predicted profitability changes, allowing for visual identification of spatial patterns and regions where labor rights enforcement is likely to have the greatest economic impact. All IDW interpolations were performed using consistent parameter settings to ensure comparability across scenarios.
+
+# Results
+
+Figure 2 depicts the global difference in profit in USD between no labor cost and fully-enforced wages, where orange and red areas have a greater magnitude of difference in profit. Areas of particular note tend to include highly-trafficked seas such as the Sea of Japan and North Atlantic. The orange and red areas are also largely closer to coastlines, including islands such as the Falkland Islands, Madagascar, the Galapagos Islands, and the Pacific Island Countries (PICs). 
+
+::: {.figure}
+
+![Change in Profit](choropleth_clipped_V8.png){width=80%} 
+:::
+
+@tbl-beneficial-owner-summary shows a summary of the percent change in profit with increased labor enforcement for certain countries. The selection of countries presented in @tbl-beneficial-owner-summary are among the 20 most frequently predicted countries and territories by McDonald et al. (2021) to violate labor rights in industrial fishing. Some of the top 20 regions (e.g., Tonga and the Northern Marianas Islands) were omitted due to a lack of available catch data.
+
+::: {#tbl-beneficial-owner-summary .table}
+| Beneficial Owner Flag                 | # Observations | Mean Change in Profit |
+|---------------------------------------|---------------:|----------------------:|
+| People's Republic of China (PRC)      |     1,898,371  |               -7.18%  |
+| Taiwan                                |     2,984,719  |               -4.40%  |
+| Philippines                           |        87,613  |               -3.79%  |
+| Republic of Korea (ROK)               |     1,346,531  |               -2.69%  |
+| Japan                                 |     2,240,963  |               -3.95%  |
+| Thailand                              |        12,343  |               -3.21%  |
+| Oman                                  |         2,611  |               -9.33%  |
+| El Salvador                           |         6,710  |               -2.59%  |
+
+Table: Summary of mean change in profit by beneficial owner flag.
+:::
+
+Figure 3 below shows the results of the IDW interpolation for all countries, where red areas are predicted to see the greatest percent change in profitability given full labor rights enforcement versus the flag state averages as calculated from McDonald et al. (2021). As this is a global analysis, much of the plot shows a prediction of substantial change in profit. Notable areas where there is predicted to be little to no change include the waters surrounding Malaysia and Indonesia, as well as much of the Southern Ocean.
+
+::: {.figure}
+![Global Predicted Change in Profit With Full Labor Rights Enforcement](fig3_globalIDW.pdf)
+:::
+
+The Appendix (Section \ref{sec:appendices}) of this paper contains a set of plots of IDW interpolation broken out by country of beneficial ownership. The countries depicted in the Appendix align with the same countries contained in @tbl-beneficial-owner-summary.
+
+# Discussion
+
+## People's Republic of China (PRC)
+
+The IDW interpolation result for the PRC distant-water fishing fleet, as the world's largest, covers almost the entirety of the oceans and gives a comparatively granular pattern of change in profit based on the enforcement of labor rights [@RefWorks:myers2022china]. The majority of the Atlantic Ocean, as well as much of the Pacific Ocean around island chains and the Indian Ocean off the east coast of Africa show large changes in profitability for the PRC fleet. The Northern Atlantic off the coast of North America stands out as a region of particularly consistent change in double-digit percentage. Enforcement of labor rights in the PRC's fleet could have large impacts on the profitability of fisheries all over the world, possibly reducing the amount of fishing in certain areas if it becomes unprofitable.
+
+## Other Asian States
+
+IDW interpolation for Taiwan, Republic of Korea (ROK), and Japan also shows potentially global impacts on fishery profitability given labor rights enforcement. Taiwan, in particular, shows a similar number of areas with high impact to profitability as the PRC, though with lower magnitude in some regions. ROK and Japan have sparser results but still at a global scale.
+
+Thailand and the Philippines show smaller areas of the oceans in the IDW interpolation results. The plot for the Philippines stretches around the globe but in a smaller number of latitudes than the aforementioned countries. Most of the high-impact areas for profit are contained to the PICs east and southeast of the Philippines, as well as off much of South America. The plot for Thailand is constrained to the Indian Ocean and off the coast of western Africa. Almost all of it, however, shows a prediction of substantial impact to profit with labor rights enforcement. Given Thailand's documented and widespread issues with labor rights violations at sea, this is unsurprising [@RefWorks:ilo2020ship].
+
+## Oman and El Salvador
+
+As exceptions to the Asia-centric list of states with known labor rights issues in the fishing industry, Oman and El Salvador present unique views of the issue. The IDW interpolation plot for Oman, covering much of the Indian Ocean and Africa's west coast, shows areas of large impacts to profitability in the Persian Gulf and most of the areas surrounding Africa. The plot for El Salvador, on the other hand, shows mild to moderate impacts on profit along the west coast of Africa. The El Salvador plot does not contain data closer to El Salvador itself; this could be due to missing data or an industrial fishing fleet that does not fish in waters close to its home country.
+
+## Limitations
+
+This study is limited by certain factors that could enhance the precision and accuracy of my findings. The technology used to identify fishing vessels and their activities - to include fishing effort and rendezvous with support vessels - is relatively new and evolving. Only large industrial vessels are required to use AIS, and a subset of those vessels are known to turn AIS off or transmit false location data [@RefWorks:gfwdark]. The Belize High Seas Fisheries Unit (BHSFU) reports vessel monitoring system (VMS) data, which may capture more vessel traffic when combined with AIS data. Additionally, during the course of this study, Global Fishing Watch released a new dataset using the European Space Agency's Sentinel-2 satellite optical imagery that triple their vessel detections [@RefWorks:gfw2025ai]. Due to the large increase in vessel detections, this new data has the potential to substantially alter the results of my model. 
+
+Another limitation of this study is the fuel price data. Due to cost, I was unable to use grey literature that contains daily regional average maritime fuel prices. The daily global average fuel price data I used in my model may not capture the effects of widely ranging fuel prices by region, thus altering the results of the study. 
+
+A third limitation of this study is a lack of official catch data or catch reconstruction data for certain countries and regions (e.g., Tonga), particularly some territories of larger countries (e.g., Christmas Island and the Northern Marianas Islands). 
+
+## Future Research
+
+There is substantial opportunity for further research on this issue set. First and foremost, more robust, recent, and granular data would serve to improve the accuracy and precision of the predicted profit changes of this model. Specifically, Global Fishing Watch's new optical dataset and regional fuel price data could make major impacts to the model outputs. Additionally, breaking catch amounts and values down by region and species could change the revenue figures. Breaking out vessels by gear type (e.g., trawler, longline, purse seine, etc.) may also make an impact to the model's results, as it did in the model McDonald et al. (2021) used to predict the risk of labor rights violations. Finally, governmental subsidies, which may constitute the difference between a profitable and unprofitable fleet, can be added to the revenue calculation.
+
+Another potential addition to this model is the use of Global Fishing Watch's All Vessels Voyages Confidence 4 dataset [@RefWorks:gfw2025vessels]. This dataset contains observations of individual voyages by vessels, including the starting and ending ports. This information could be used to determine which regions down to port-level could be targeted for enforcement to have the greatest effect on profits due to labor rights violations.
+
+A third possible improvement to the model in this paper is a more robust set of labor costs. For the purposes of this paper, labor cost was limited to the wages of the crew while at sea. In reality, services such as medical care, food, water, insurance, and more serve to drive up labor costs for employers. In cases of labor rights abuse, many of these services have been reduced or denied to employees [@RefWorks:ejf2010abuse]. 
+
+Support vessel costs - carrier vessels and bunker vessels - could also be factored into the model. Carrier vessels, which transfer catch from fishing vessels and carry it to port to be sold, allow fishing vessels to stay fishing at sea for much longer. Similarly, bunker vessels provide refueling at sea. Fuel, labor, and miscellaneous costs for these vessels could substantively alter the model results.
+
+Beyond the scope of this paper, a use case for this model could include a dashboard that would serve to assist governments and NGOs in their work. A dashboard, continually updated with the latest data, could serve as a resource to predict where labor rights enforcement, legislative efforts, and targeted information campaigns would be most effective at reducing the profitability of fishing fleets in certain areas.  
+
+# Conclusion
+
+If a fishery were to become unprofitable due to increased labor costs, the fleet may choose to abandon fishing efforts within it. This opens the possibility of combating IUU fishing in targeted geographic areas through labor rights enforcement.
+
+This study demonstrates that the profitability of industrial fishing is linked not only to ecological and economic factors, but also to the regulatory environment governing labor practices. By spatially modeling profit margins under scenarios of full labor rights enforcement, the analysis reveals that in many regions, especially those currently dominated by distant-water fleets, improved labor standards would significantly erode economic incentives for continued exploitation. If labor costs were to rise to the point that certain fisheries became unprofitable, fleets would likely abandon operations in those areas, suggesting that labor rights enforcement can serve as an effective, underutilized lever to promote ocean sustainability and human rights simultaneously.
+
+From a policy perspective, the results highlight the importance of integrating labor protections into the global fisheries governance regime. International cooperation to raise and enforce labor standards through port state measures, trade policy, and seafood certification can shift the economic calculus for fleet operators more powerfully than catch limits or subsidies alone. Targeting labor enforcement in regions where profit margins are narrow and violations are prevalent may yield disproportionate gains for both conservation and social justice.
+
+Future research efforts should focus on improving the quality and robustness of fishing and labor data, expanding the complexity of the economic model, tailoring the results to maximize usefulness for stakeholders, and expanding understanding of the possible follow-on effects of decreased fisheries profitability. Ultimately, aligning the economics of fishing with basic human rights can drive the industry toward more ethical and sustainable outcomes, benefiting fish stocks, coastal communities, and workers alike.
+
+\clearpage
+
+```{=latex}
+\includepdf[
+  pages=-,
+  landscape=true,
+  scale=0.9,
+  pagecommand={\section{Appendices}\label{sec:appendices}}
+]{appendix 1a_final.pdf}
+\includepdf[pages=-, landscape=true, scale=0.9]{appendix 1b_final.pdf}
+```
+
+\clearpage
+
+# References
+

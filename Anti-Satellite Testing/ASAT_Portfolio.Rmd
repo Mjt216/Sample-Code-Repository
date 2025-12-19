@@ -10,6 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
+options(bitmapType='cairo')
 library(flexdashboard)
 library(tidyverse)
 library(maps)
@@ -54,17 +55,14 @@ CFSCC. (2023, Sep 24). SSR. Retrieved from Space-Track.org: space-track.org/#ssr
 
 ### Tests Over Time
 
-```{r,fig.cap="This line chart shows global ASAT tests over time. The peaks are in the 1960's and more recently, with a lull after the fall of the Soviet Union."}
+```{r}
+# 1. Load and clean
 tests_per_year <- read.csv("tests_per_year.csv")
+tests_per_year$Year <- as.numeric(as.character(tests_per_year$Year))
 
-if (is.character(tests_per_year$Year)) {
-  tests_per_year$Year <- as.factor(tests_per_year$Year)
-} else if (is.numeric(tests_per_year$Year)) {
-  tests_per_year$Year <- as.integer(tests_per_year$Year) 
-}
-
+# 2. Build plot
 ggplot_obj <- ggplot(tests_per_year, aes(x=Year, y=total_tests)) +
-  geom_line(color="darkred", size=1.5) + 
+  geom_line(color="darkred", linewidth=1.5) + 
   labs(title='Total Global ASAT Tests Per Year', x='Year', y='Total Tests') +
   theme_dark() +
   theme(plot.background = element_rect(fill = "grey34"),
@@ -73,12 +71,24 @@ ggplot_obj <- ggplot(tests_per_year, aes(x=Year, y=total_tests)) +
         axis.text = element_text(size = 12, color = "grey90"),
         axis.title.y = element_text(size = 15, color = "grey90"))
 
+# 3. Define animation
 anim_obj <- ggplot_obj + 
   transition_reveal(Year) +
   ease_aes('linear')
 
-animate(anim_obj, duration = 10, fps = 10, width = 800, height = 600, renderer = gifski_renderer())
-anim_save("total_ASAT.gif", animation = anim_obj)
+# 4. THE FIX: Render to file manually
+# By setting 'file', we bypass the internal 'if' check that causes the crash
+if(!file.exists("total_ASAT.gif")){
+  animate(anim_obj, 
+          duration = 10, 
+          fps = 10, 
+          width = 800, 
+          height = 600, 
+          renderer = gifski_renderer("total_ASAT.gif"))
+}
+
+# 5. Display the file
+knitr::include_graphics("total_ASAT.gif")
 ```
 
 Launch Locations
@@ -89,44 +99,59 @@ Row
 
 ### <font size = "5">Launch Sites</font>
 
-```{r, out.height="100%",out.width="100%", fig.cap="This is a map of the launch locations for all historical anti-satellite (ASAT) tests. As you can see, only Russia (formerly USSR), China, the United States, and India have conducted such tests. The size of each point corresponds to the number of tests conducted from that particular site. It is interesting to note that the United States has taken advantage of its access to island launch sites near the equator. The closer a launch is to the equator, the less fuel the rocket needs to burn due to the higher speed of the Earth's rotation at that latitude."}
-my_world_map <- map_data("world")
+```{r, out.height="100%", out.width="100%", fig.cap="This is a map of the launch locations for all historical anti-satellite (ASAT) tests. As you can see, only Russia (formerly USSR), China, the United States, and India have conducted such tests. The size of each point corresponds to the number of tests conducted from that particular site. It is interesting to note that the United States has taken advantage of its access to island launch sites near the equator. The closer a launch is to the equator, the less fuel the rocket needs to burn due to the higher speed of the Earth's rotation at that latitude."}
+library(tidyverse)
+library(maps)
 
+# 1. Load and Clean
+my_world_map <- map_data("world")
 launch_data <- read_csv("ASAT_Hx.csv")
 
-launch_data$Launch_lat <- as.numeric(launch_data$Launch_lat)
-launch_data$Launch_long <- as.numeric(launch_data$Launch_long)
+launch_data <- launch_data %>%
+  mutate(
+    Launch_lat = as.numeric(Launch_lat),
+    Launch_long = as.numeric(Launch_long)
+  ) %>%
+  filter(!is.na(Launch_long))
 
-launch_data <- launch_data %>% filter(!is.na(Launch_long))
-
+# 2. Categorize
 launch_data <- launch_data %>%
   mutate(Country = case_when(
     Launch_Site %in% c("Baikonur", "Plesetsk") ~ "Russia",
     Launch_Site %in% c("Xichang", "Korla", "Jiuquan") ~ "China",
     Launch_Site %in% c("San Nicholas Island", "WSMR", "Kwajalein", "Johnston Island", "AFETR") ~ "USA",
-    Launch_Site == "Abdul Kalam island" ~ "India"))
+    Launch_Site == "Abdul Kalam island" ~ "India",
+    TRUE ~ "Other"
+  ))
 
-site_counts <- launch_data %>% group_by(Launch_Site) %>% summarize(Count = n())
+# 3. Size by Count
+site_counts <- launch_data %>% 
+  group_by(Launch_Site) %>% 
+  summarize(Count = n(), .groups = "drop")
 
-ggplot(data = my_world_map, mapping = aes(x = long, y = lat, group = group)) +
-  geom_polygon(fill = "grey90", color = "black") +
-  geom_point(data = launch_data, aes(x = Launch_long, y = Launch_lat, group = NULL, color = Country, size = Launch_Site)) +
-  scale_size_discrete(guide = "none") + 
+launch_data <- launch_data %>% left_join(site_counts, by = "Launch_Site")
+
+# 4. Plot
+ggplot() +
+  geom_polygon(data = my_world_map, aes(x = long, y = lat, group = group), 
+               fill = "grey90", color = "black") +
+  geom_point(data = launch_data, 
+             aes(x = Launch_long, y = Launch_lat, color = Country, size = Count)) +
+  scale_size_continuous(range = c(2, 8), name = "Number of Tests") + 
   scale_color_manual(values = c(Russia = "darkred", China = "gold", USA = "darkblue", India = "darkgreen")) +
-  guides(color = guide_legend(title = "Launching Country")) +
-    coord_equal(ratio = 1) +
-  theme(legend.position="top") +
-  theme(plot.title = element_text(hjust = 0.5)) +
-  theme(axis.title.x = element_blank()) +
-  theme(axis.title.y = element_blank()) +
-    theme(plot.background = element_rect(fill = "grey34"),
-        panel.background = element_rect(fill = "grey34"),
-        plot.title = element_text(color = "grey66"),
-        legend.text = element_text(color = "grey66"),  
-        legend.title = element_text(color = "grey66"),
-        legend.key = element_rect(fill = "grey34"),
-        legend.background = element_rect(fill = "grey34")) +
-  ggtitle("ASAT Test Launch Locations")
+  coord_equal(ratio = 1) +
+  labs(title = "ASAT Test Launch Locations") +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    plot.background = element_rect(fill = "grey34"),
+    panel.background = element_rect(fill = "grey34"),
+    panel.grid = element_blank(),
+    axis.text = element_blank(),
+    axis.title = element_blank(),
+    legend.text = element_text(color = "grey66"),
+    legend.title = element_text(color = "grey66")
+  )
 ```
 
 Testing Over Time
@@ -263,4 +288,3 @@ ggplot(ASAT_hx, aes(x = TotalDebris, y = Country, fill = Country)) +
 
 #![](Ridge Chart.png)
 ```
-

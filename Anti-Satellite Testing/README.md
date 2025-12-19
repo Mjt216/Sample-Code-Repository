@@ -1,6 +1,6 @@
 The Anti-Satellite (ASAT) Test project was done for my Data Visualization course.
 
-The 'Portfolio' folder contains the final dashboard containing most of the visualizations that I created for the course. It also contains a description of ASAT testing and of the contributing data.
+The 'ASAT_Portfolio' Markdown document contains the final dashboard containing most of the visualizations that I created for the course. It also contains a description of ASAT testing and of the contributing data.
 
 The 'Tableau' folder contains a workbook file with the portfolio proposal and some initial visualizations done in Tableau
 

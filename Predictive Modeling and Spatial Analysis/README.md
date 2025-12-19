@@ -1,5 +1,9 @@
 
-In this repository, I present a spatial and economic analysis of the global industrial fishing industry, investigating how the enforcement of labor rights would impact the profitability of high-seas fleets. By modeling the economic shift from exploitative labor to fully enforced wages, I demonstrate that improved labor standards would significantly reduce profit margins in regions dominated by distant-water operations, particularly those with high risks of labor rights violations.
+In this paper, I present a spatial and economic analysis of the global industrial fishing industry, investigating how the enforcement of labor rights would impact the profitability of high-seas fleets. By modeling the economic shift from exploitative labor to fully enforced wages, I demonstrate that improved labor standards would significantly reduce profit margins in regions dominated by distant-water operations, particularly those with high risks of labor rights violations. 
+
+The paper itself is Final-Draft_Tompkins.pdf. 
+
+**Note: Much of the supporting data and analysis could not be uploaded here due to size contraints.
 
 Data Science Skills Demonstrated
 

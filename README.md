@@ -1,4 +1,4 @@
-This code sample repository contains examples of my work. All examples are from graduate academic courses, as my professional work to date is unable to be shared publicly. There is a README file in each folder to explain each in more detail.
+This code sample repository contains examples of my work. All examples are from graduate academic courses, as my professional work to date is unable to be shared publicly. 
 
 The 'Data Visualization (Anti-Satellite Testing)' folder contains examples of R code and visualizations, as well as a Tableau file with additional visualizations.
 
